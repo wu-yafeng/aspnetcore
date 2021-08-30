@@ -1,13 +1,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Pipelines;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Internal;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Features;
@@ -48,7 +44,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
         private int _currentMemoryPrefixBytes;
 
         private readonly ConcurrentPipeWriter _pipeWriter;
-        private IMemoryOwner<byte>? _fakeMemoryOwner;
+        private FakeMemory? _fakeBuffer;
 
         // Chunked responses need to be treated uniquely when using GetMemory + Advance.
         // We need to know the size of the data written to the chunk before calling Advance on the
@@ -408,10 +404,10 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
             {
                 _pipeWriter.Abort();
 
-                if (_fakeMemoryOwner != null)
+                if (_fakeBuffer != null)
                 {
-                    _fakeMemoryOwner.Dispose();
-                    _fakeMemoryOwner = null;
+                    _fakeBuffer.Dispose();
+                    _fakeBuffer = null;
                 }
 
                 // Call dispose on any memory that wasn't written.
@@ -652,14 +648,27 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http
 
         internal Memory<byte> GetFakeMemory(int minSize)
         {
-            if (_fakeMemoryOwner == null || _fakeMemoryOwner.Memory.Length < minSize)
+            // Release current buffer if smaller than request size.
+            if (_fakeBuffer == null || _fakeBuffer.AvailableMemory.Length < minSize)
             {
-                _fakeMemoryOwner?.Dispose();
+                _fakeBuffer?.Dispose();
 
-                _fakeMemoryOwner = HttpOutputProducerHelper.ReserveFakeMemory(_memoryPool, minSize);
+                _fakeBuffer = new FakeMemory();
             }
 
-            return _fakeMemoryOwner.Memory;
+            // Requesting a bigger buffer could throw.
+            if (minSize <= _memoryPool.MaxBufferSize)
+            {
+                // Use the specified pool as it fits.
+                _fakeBuffer.SetOwnedMemory(_memoryPool.Rent(minSize));
+            }
+            else
+            {
+                // Use the array pool. Its MaxBufferSize is int.MaxValue.
+                _fakeBuffer.SetOwnedMemory(ArrayPool<byte>.Shared.Rent(minSize));
+            }
+
+            return _fakeBuffer.AvailableMemory;
         }
 
         private Memory<byte> LeasedMemory(int sizeHint)

@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
         private bool _streamCompleted;
         private bool _disposed;
         private bool _suffixSent;
-        private IMemoryOwner<byte>? _fakeMemoryOwner;
+        private FakeMemory? _fakeBuffer;
 
         public Http3OutputProducer(
              Http3FrameWriter frameWriter,
@@ -83,10 +83,10 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
 
                 Stop();
 
-                if (_fakeMemoryOwner != null)
+                if (_fakeBuffer != null)
                 {
-                    _fakeMemoryOwner.Dispose();
-                    _fakeMemoryOwner = null;
+                    _fakeBuffer.Dispose();
+                    _fakeBuffer = null;
                 }
             }
         }
@@ -210,14 +210,27 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
 
         internal Memory<byte> GetFakeMemory(int minSize)
         {
-            if (_fakeMemoryOwner == null || _fakeMemoryOwner.Memory.Length < minSize)
+            // Release current buffer if smaller than request size.
+            if (_fakeBuffer == null || _fakeBuffer.AvailableMemory.Length < minSize)
             {
-                _fakeMemoryOwner?.Dispose();
+                _fakeBuffer?.Dispose();
 
-                _fakeMemoryOwner = HttpOutputProducerHelper.ReserveFakeMemory(_memoryPool, minSize);
+                _fakeBuffer = new FakeMemory();
             }
 
-            return _fakeMemoryOwner.Memory;
+            // Requesting a bigger buffer could throw.
+            if (minSize <= _memoryPool.MaxBufferSize)
+            {
+                // Use the specified pool as it fits.
+                _fakeBuffer.SetOwnedMemory(_memoryPool.Rent(minSize));
+            }
+            else
+            {
+                // Use the array pool. Its MaxBufferSize is int.MaxValue.
+                _fakeBuffer.SetOwnedMemory(ArrayPool<byte>.Shared.Rent(minSize));
+            }
+
+            return _fakeBuffer.AvailableMemory;
         }
 
         [StackTraceHidden]
