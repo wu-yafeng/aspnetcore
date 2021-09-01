@@ -122,7 +122,7 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
                 apiDescription.ParameterDescriptions.Add(parameterDescription);
             }
 
-            // Get custom attributes for the handler. ConsumesAttribute is one of the examples. 
+            // Get custom attributes for the handler. ConsumesAttribute is one of the examples.
             var acceptsRequestType = routeEndpoint.Metadata.GetMetadata<IAcceptsMetadata>()?.RequestType;
             if (acceptsRequestType is not null)
             {
@@ -267,7 +267,7 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
                 responseType = typeof(void);
             }
 
-            var responseMetadata = endpointMetadata.GetOrderedMetadata<IApiResponseMetadataProvider>();
+            var responseMetadata = endpointMetadata.GetOrderedMetadata<Microsoft.AspNetCore.Mvc.IApiResponseMetadataProvider>();
             var errorMetadata = endpointMetadata.GetMetadata<ProducesErrorResponseTypeAttribute>();
             var defaultErrorType = errorMetadata?.Type ?? typeof(void);
             var contentTypes = new MediaTypeCollection();

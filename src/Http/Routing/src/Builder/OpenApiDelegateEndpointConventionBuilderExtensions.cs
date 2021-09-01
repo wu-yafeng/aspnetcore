@@ -2,15 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Microsoft.AspNetCore.Http
 {
     /// <summary>
     /// Extension methods for adding response type metadata to endpoints.
     /// </summary>
-    public static class OpenApiEndpointConventionBuilderExtensions
+    public static class OpenApiDelegateEndpointConventionBuilderExtensions
     {
         private static readonly ExcludeFromDescriptionAttribute _excludeFromDescriptionMetadataAttribute = new();
 
@@ -150,7 +150,7 @@ namespace Microsoft.AspNetCore.Http
         public static DelegateEndpointConventionBuilder Accepts(this DelegateEndpointConventionBuilder builder,
             Type requestType, string contentType, params string[] additionalContentTypes)
         {
-            builder.WithMetadata(new ConsumesAttribute(requestType, contentType, additionalContentTypes));
+            // builder.WithMetadata(new ConsumesAttribute(requestType, contentType, additionalContentTypes));
             return builder;
         }
     }

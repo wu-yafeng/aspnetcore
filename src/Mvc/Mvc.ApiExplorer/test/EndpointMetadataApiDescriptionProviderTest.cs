@@ -483,6 +483,12 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         [Fact]
         public void RespectsProducesWithGroupNameExtensionMethod()
         {
+            // Console.WriteLine($"Waiting for debugger to attach on {System.Environment.ProcessId}");
+            // while (!System.Diagnostics.Debugger.IsAttached)
+            // {
+            //     Thread.Sleep(100);
+            // }
+            // Console.WriteLine("Debugger attached");
             // Arrange
             var endpointGroupName = "SomeEndpointGroupName";
             var builder = new TestEndpointRouteBuilder(new ApplicationBuilder(null));
