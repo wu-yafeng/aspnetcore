@@ -36,13 +36,13 @@
     <Reference Include="Microsoft.Extensions.Identity.Stores" />
   </ItemGroup>
 
-  <!--Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
+  <Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
     <ItemGroup>
       <_RazorGenerate Include="Areas\Identity\Pages\V5\**\*.cshtml" />
 
       <RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Identity\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
-  </Target-->
+  </Target>
 
   <Target Name="GetIdentityUIAssets" Returns="@(ReferenceAsset)">
     <ItemGroup>
