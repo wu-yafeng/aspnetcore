@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -201,7 +202,8 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
             return results.Values.ToList();
         }
 
-        private static void CalculateResponseFormatForType(ApiResponseType apiResponse, MediaTypeCollection declaredContentTypes, IEnumerable<IApiResponseTypeMetadataProvider>? responseTypeMetadataProviders, IModelMetadataProvider? modelMetadataProvider)
+        // Shared with EndpointMetadataApiDescriptionProvider
+        internal static void CalculateResponseFormatForType(ApiResponseType apiResponse, MediaTypeCollection declaredContentTypes, IEnumerable<IApiResponseTypeMetadataProvider>? responseTypeMetadataProviders, IModelMetadataProvider? modelMetadataProvider)
         {
             // If response formats have already been calculate for this type,
             // then exit early. This avoids populating the ApiResponseFormat for
@@ -317,7 +319,8 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
             return declaredReturnType;
         }
 
-        private static bool IsClientError(int statusCode)
+        // Shared with EndpointMetadataApiDescriptionProvider
+        internal static bool IsClientError(int statusCode)
         {
             return statusCode >= 400 && statusCode < 500;
         }
