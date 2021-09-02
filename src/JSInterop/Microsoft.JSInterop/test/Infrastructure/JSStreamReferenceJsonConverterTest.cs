@@ -16,7 +16,7 @@ namespace Microsoft.JSInterop.Infrastructure
         public JSStreamReferenceJsonConverterTest()
         {
             JsonSerializerOptions = JSRuntime.JsonSerializerOptions;
-            JsonSerializerOptions.Converters.Add(new JSStreamReferenceJsonConverter(JSRuntime));
+            JsonSerializerOptions.Converters.Add(new JSRuntimeProvider(JSRuntime));
         }
 
         [Fact]
