@@ -1,0 +1,4 @@
+<Project>
+  <Import Condition="'$(IdentityUIFrameworkVersion)' == 'V4'" Project="$(MSBuildThisFileDirectory)Microsoft.AspNetCore.StaticWebAssets.V4.targets"/>
+  <Import Condition="'$(IdentityUIFrameworkVersion)' == 'V5'" Project="$(MSBuildThisFileDirectory)Microsoft.AspNetCore.StaticWebAssets.V5.targets"/>
+</Project>
