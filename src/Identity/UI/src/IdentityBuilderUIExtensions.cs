@@ -33,8 +33,8 @@ namespace Microsoft.AspNetCore.Identity
         {
             builder.AddSignInManager();
             builder.Services
-                .AddMvc();
-/*                .ConfigureApplicationPartManager(apm =>
+                .AddMvc()
+                .ConfigureApplicationPartManager(apm =>
                 {
                     // We try to resolve the UI framework that was used by looking at the entry assembly.
                     // When an app runs, the entry assembly will point to the built app. In some rare cases
@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.Identity
                         apm.ApplicationParts.Add(part);
                     }
                     apm.FeatureProviders.Add(new ViewVersionFeatureProvider(framework == UIFramework.Bootstrap4));
-                });*/
+                });
 
             builder.Services.ConfigureOptions(
                 typeof(IdentityDefaultUIConfigureOptions<>)
@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.Identity
 
                 foreach (var descriptorToRemove in viewsToRemove)
                 {
-//                    feature.ViewDescriptors.Remove(descriptorToRemove);
+                    feature.ViewDescriptors.Remove(descriptorToRemove);
                 }
             }
 
